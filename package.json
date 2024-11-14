@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "03_youtube_backend": "file:",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "latest": "^0.2.0",
