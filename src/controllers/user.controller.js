@@ -291,14 +291,6 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
 
     //TODO: delete old image - assignment
 
-    const user = await User.findById(req.user?._id);
-
-    // Delete the old avatar from Cloudinary if it exists
-    if (user.avatar) {
-        const publicId = user.avatar.split('/').pop().split('.')[0];
-        await deleteFromCloudinary(publicId);
-    }
-
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
     if (!avatar.url) {
@@ -306,28 +298,20 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
         
     }
 
-    user.avatar = avatar.url;
-    await user.save({ validateBeforeSave: false });
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set:{
+                avatar: avatar.url
+            }
+        },
+        {new: true}
+    ).select("-password")
 
-    const updatedUser = await User.findById(req.user?._id).select("-password");
-
-    // const user = await User.findByIdAndUpdate(
-    //     req.user?._id,
-    //     {
-    //         $set:{
-    //             avatar: avatar.url
-    //         }
-    //     },
-    //     {new: true}
-    // ).select("-password")
-
-    // return res
-    // .status(200)
-    // .json(
-    //     new ApiResponse(200, user, "Avatar image updated successfully")
-    // )
-    return res.status(200).json(
-        new ApiResponse(200, updatedUser, "Avatar image updated successfully")
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, user, "Avatar image updated successfully")
     )
 })
 
