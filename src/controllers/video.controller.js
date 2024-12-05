@@ -77,14 +77,14 @@ const publishAVideo = asyncHandler(async (req, res) => {
     }
 
     // Upload video to Cloudinary
-    const videocloudinary = await uploadOnCloudinary(videolocalpath);
-    if (!videocloudinary || !videocloudinary.url) {
+    const videoFile = await uploadOnCloudinary(videolocalpath);
+    if (!videoFile || !videoFile.url) {
         throw new ApiError(500, "Failed to upload video to Cloudinary.");
     }
 
     // Upload thumbnail to Cloudinary
-    const thumbnailCloudinary = await uploadOnCloudinary(thumbnailPath);
-    if (!thumbnailCloudinary || !thumbnailCloudinary.url) {
+    const thumbnail = await uploadOnCloudinary(thumbnailPath);
+    if (!thumbnail || !thumbnail.url) {
         throw new ApiError(500, "Failed to upload thumbnail to Cloudinary.");
     }
 
@@ -92,11 +92,11 @@ const publishAVideo = asyncHandler(async (req, res) => {
     const video = await Video.create({
         title,
         description,
-        videocloudinary: videocloudinary.url,
-        thumbnail: thumbnailCloudinary.url,
+        videoFile: videoFile.url,
+        thumbnail: thumbnail.url,
         owner: req.user._id,
-        duration: videocloudinary.duration || 0,
-        views: videocloudinary.views || 0,
+        duration: videoFile.duration || 0,
+        views: videoFile.views || 0,
         isPublished: false,
     });
 
