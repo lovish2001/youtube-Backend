@@ -60,6 +60,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     
 })
 
+
 const publishAVideo = asyncHandler(async (req, res) => {
     console.log("in publish video");
     console.log("req.files: ", req.files);
