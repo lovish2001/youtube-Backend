@@ -129,6 +129,12 @@ const getLikedVideos = asyncHandler(async (req, res) => {
             }
         },
         {
+            $unwind: {
+                path: "$likedvideos",
+                preserveNullAndEmptyArrays: false, // Remove documents without a matching video
+            },
+        },
+        {
             $project: {           
                 _id: 0,           
                 videoFile: "$likedvideos.videoFile",

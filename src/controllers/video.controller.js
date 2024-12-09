@@ -19,33 +19,26 @@ const getAllVideos = asyncHandler(async (req, res) => {
         throw new ApiError('Invalid userId', 400)
     }
 
-    const videos = await User.aggregate([
+    const videos = await Video.aggregate([
         {
             $match: {
-                _id: new mongoose.Types.ObjectId(userId), // Match the user by `userId`
+                owner: new mongoose.Types.ObjectId(userId), // Match the user by `userId`
             },
         },
         {
             $lookup: {
                 from: "videos", 
-                localField: "_id",
-                foreignField: "owner",
+                localField: "owner",
+                foreignField: "_id",
                 as: "userVideos" 
             }
         },
         {
             $project: {           
                 _id: 0,           
-                // username: 1,      
-                // userVideos: 1 
-                // if you want only video
-                userVideos: {
-                    $map: {
-                        input: "$userVideos",
-                        as: "video",
-                        in: "$$video.videoFile" // Extract only the `videofile` field from each tweet
-                    }
-                } 
+                title: 1,
+                description: 1,    
+                videoFile: 1, 
             }
         }
     ])
