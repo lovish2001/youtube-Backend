@@ -45,15 +45,15 @@ const getUserTweets = asyncHandler(async (req, res) => {
         throw new ApiError('Invalid userId', 400)
     }
        
-    const tweets = await User.aggregate([
+    const tweets = await Tweet.aggregate([
         {
             $match: {
-                _id: await new mongoose.Types.ObjectId(userId) // Match the user by `userId`
+                owner: await new mongoose.Types.ObjectId(userId) // Match the user by `userId`
             }
         },
         {
             $lookup: {
-                from: "tweets", 
+                from: "users", 
                 localField: "_id", 
                 foreignField: "owner",
                 as: "userTweets" 
@@ -62,16 +62,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
         {
             $project: {           
                 _id: 0,           
-                //username: 1,      
-                //userTweets: 1 
-                // if you want only content
-                userTweets: {
-                    $map: {
-                        input: "$userTweets",
-                        as: "tweet",
-                        in: "$$tweet.content" // Extract only the `content` field from each tweet
-                    }
-                } 
+                content: 1
             }
         }
     ]);
