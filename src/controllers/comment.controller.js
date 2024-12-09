@@ -18,17 +18,17 @@ const getVideoComments = asyncHandler(async (req, res) => {
     console.log("video id is valid");
     
 
-    const comments = await Video.aggregate([
+    const comments = await Comment.aggregate([
         {
             $match: {
-                _id: await new mongoose.Types.ObjectId(videoId) // Match the video by `videoId`
+                video: await new mongoose.Types.ObjectId(videoId) // Match the video by `videoId`
             }
         },
         {
             $lookup: {
-                from: "comments", 
-                localField: "_id", 
-                foreignField: "video",
+                from: "videos", 
+                localField: "video", 
+                foreignField: "_id",
                 as: "videoComments" 
             }
         },
@@ -36,15 +36,10 @@ const getVideoComments = asyncHandler(async (req, res) => {
             $project: {           
                 _id: 0,           
                 //username: 1,      
-                //videoComments: 1 
-                // if you want only content
-                videoComments: {
-                    $map: {
-                        input: "$videoComments",
-                        as: "comment",
-                        in: "$$comment.content" // Extract only the `content` field from each tweet
-                    }
-                } 
+                content : 1,
+                // "videoFile": "$videoComments.videoFile",
+                // "title": "$videoComments.title",
+                // "description": "$videoComments.description",
             }
         }
     ]);
